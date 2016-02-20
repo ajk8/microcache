@@ -1,4 +1,5 @@
 import logging
+from contextlib import contextmanager
 from ._version import __version__, __version_info__  # flake8: noqa
 
 logger = logging.getLogger(__name__)
@@ -150,4 +151,20 @@ def enable():
     >>> microcache.has('enable')
     True
     """
+    options.enabled = True
+
+
+@contextmanager
+def temporarily_disabled():
+    """ Temporarily disable the cache (useful for testing)
+
+    >>> import microcache
+    >>> with microcache.temporarily_disabled():
+    ...     microcache.upsert('temp', 'disable')
+    ...
+    >>> microcache.has('temp')
+    False
+    """
+    options.enabled = False
+    yield
     options.enabled = True
