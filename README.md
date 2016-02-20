@@ -4,7 +4,7 @@ A Really! Small! Cache! for python 2 and 3.
 
 ## Why?
 
-Working on a totally separate project, I found myself wanting to use [@funcy.memoize](http://funcy.readthedocs.org/en/stable/calc.html#memoize)...a lot.  There was a major problem, though: I couldn't test with it.  There was no (obvious) way to turn it off.  It was making me crazy, so I spent a few hours writing a small module (even smaller than this, originally) to suit the memoization needs, with a hook to turn it off for testing.  When I got to the end of my feature sprint for that project, I decided it made more sense to spin it out into its own project, so here we are!
+Working on a totally separate project, I found myself wanting to use [funcy.memoize](http://funcy.readthedocs.org/en/stable/calc.html#memoize)...a lot.  There was a major problem, though: I couldn't test with it.  There was no (obvious) way to turn it off.  It was making me crazy, so I spent a few hours writing a small module (even smaller than this, originally) to suit the memoization needs, with a hook to turn it off for testing.  When I got to the end of my feature sprint for that project, I decided it made more sense to spin it out into its own project, so here we are!
 
 ## Current features
 
