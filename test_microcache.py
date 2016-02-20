@@ -56,3 +56,10 @@ def test_this():
     assert entry['flag'] is True
     microcache.options.enabled = True
 
+
+def test_disable_no_clear():
+    microcache.upsert('test_disable_no_clear', 'value')
+    microcache.disable(clear_cache=False)
+    assert microcache.has('test_disable_no_clear') is False
+    microcache.enable()
+    assert microcache.has('test_disable_no_clear') is True

@@ -1,5 +1,6 @@
 import logging
-from contextlib import contextmanager
+import functools
+import contextlib
 from ._version import __version__, __version_info__  # flake8: noqa
 
 logger = logging.getLogger(__name__)
@@ -109,6 +110,7 @@ def this(func):
     'value'
     """
 
+    @functools.wraps(func)
     def func_wrapper(*args, **kwargs):
         key = func.__name__ + str(args) + str(kwargs)
         logger.debug('this({})'.format(key))
@@ -122,7 +124,7 @@ def this(func):
     return func_wrapper
 
 
-def disable():
+def disable(clear_cache=True):
     """ Disable the cache and clear its contents
 
     >>> import microcache
@@ -134,7 +136,8 @@ def disable():
     >>> microcache.has('disable')
     False
     """
-    clear()
+    if clear_cache:
+        clear()
     options.enabled = False
 
 
@@ -154,7 +157,7 @@ def enable():
     options.enabled = True
 
 
-@contextmanager
+@contextlib.contextmanager
 def temporarily_disabled():
     """ Temporarily disable the cache (useful for testing)
 
@@ -165,6 +168,25 @@ def temporarily_disabled():
     >>> microcache.has('temp')
     False
     """
+    old_setting = options.enabled
     options.enabled = False
     yield
+    options.enabled = old_setting
+
+
+@contextlib.contextmanager
+def temporarily_enabled():
+    """ Temporarily enable the cache (useful for testing)
+
+    >>> import microcache
+    >>> with microcache.temporarily_disabled():
+    ...     with microcache.temporarily_enabled():
+    ...         microcache.upsert('temp', 'disable')
+    ...
+    >>> microcache.has('temp')
+    True
+    """
+    old_setting = options.enabled
     options.enabled = True
+    yield
+    options.enabled = old_setting
