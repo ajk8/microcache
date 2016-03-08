@@ -1,5 +1,8 @@
 # microcache
 
+[![Latest Version](https://img.shields.io/pypi/v/microcache.svg)](https://pypi.python.org/pypi/microcache)
+[![Build Status](https://travis-ci.org/ajk8/microcache.svg?branch=master)](https://travis-ci.org/ajk8/microcache)
+
 A Really! Small! Cache! for python 2 and 3.
 
 ## Why?
