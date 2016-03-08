@@ -10,6 +10,7 @@ python:
 install:
     - pip install --upgrade pip setuptools
     - pip install -r requirements.txt
+    - pip install hatchery
     - pip install coveralls
 
 script:
