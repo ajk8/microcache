@@ -7,12 +7,18 @@ logger = logging.getLogger(__name__)
 _CACHE = {}
 
 
-class Options(object):
+class MicrocacheOptions(object):
     def __init__(self):
         self.enabled = True
+        self.debug = False
 
 
-options = Options()
+options = MicrocacheOptions()
+
+
+def _set_log_level():
+    """ Make sure that logging is respecting the debug setting """
+    logger.setLevel(logging.DEBUG if options.debug else logging.INFO)
 
 
 def has(key):
@@ -25,6 +31,7 @@ def has(key):
     >>> microcache.has('has')
     True
     """
+    _set_log_level()
     logger.debug('has({})'.format(key))
     return key in _CACHE.keys() and options.enabled
 
@@ -41,6 +48,7 @@ def upsert(key, value):
     >>> microcache.get('upsert')
     'that'
     """
+    _set_log_level()
     logger.debug('upsert({}, {})'.format(key, value))
     if not options.enabled:
         return
@@ -59,6 +67,7 @@ def get(key, default=None):
     >>> microcache.get('get', 'default')
     'got'
     """
+    _set_log_level()
     logger.debug('get({}, default={})'.format(key, default))
     if has(key):
         return _CACHE[key]
@@ -84,6 +93,7 @@ def clear(key=None):
     >>> microcache.has("don't")
     False
     """
+    _set_log_level()
     logger.debug('clear({})'.format(key))
     if not options.enabled:
         return
@@ -112,6 +122,7 @@ def this(func):
 
     @functools.wraps(func)
     def func_wrapper(*args, **kwargs):
+        _set_log_level()
         key = func.__name__ + str(args) + str(kwargs)
         logger.debug('this({})'.format(key))
         if has(key) and options.enabled:
