@@ -19,6 +19,9 @@ setup(
     download_url='{0}/tarball/{1}'.format(GITHUB_ROOT, _version.__version__),
     license='MIT',
     packages=[PROJECT_NAME],
+    install_requires=[
+        'decorator==4.2.1'
+    ],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
