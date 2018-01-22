@@ -1,6 +1,7 @@
-import logging
-import functools
 import contextlib
+import decorator
+import logging
+import time
 from ._version import __version__, __version_info__  # flake8: noqa
 
 logger = logging.getLogger(__name__)
@@ -21,6 +22,18 @@ def _set_log_level():
     logger.setLevel(logging.DEBUG if options.debug else logging.INFO)
 
 
+class MicrocacheItem(object):
+    def __init__(self, value, ttl):
+        self.value = value
+        self.ttl = ttl
+        self.timestamp = time.time()
+
+    def is_expired(self):
+        if self.ttl is None:
+            return False
+        return time.time() - self.timestamp > self.ttl
+
+
 def has(key):
     """ See if a key is in the cache
 
@@ -30,13 +43,20 @@ def has(key):
     >>> microcache.upsert('has', 'now')
     >>> microcache.has('has')
     True
+    >>> import time
+    >>> microcache.upsert('has', 'gone', ttl=2)
+    >>> microcache.has('has')
+    True
+    >>> time.sleep(2)
+    >>> microcache.has('has')
+    False
     """
     _set_log_level()
     logger.debug('has({})'.format(key))
-    return key in _CACHE.keys() and options.enabled
+    return options.enabled and key in _CACHE.keys() and not _CACHE[key].is_expired()
 
 
-def upsert(key, value):
+def upsert(key, value, ttl=None):
     """ Perform an upsert on the cache
 
     >>> import microcache
@@ -44,7 +64,7 @@ def upsert(key, value):
     >>> microcache.upsert('upsert', 'this')
     >>> microcache.get('upsert')
     'this'
-    >>> microcache.upsert('upsert', 'that')
+    >>> microcache.upsert('upsert', 'that', ttl=5)
     >>> microcache.get('upsert')
     'that'
     """
@@ -52,7 +72,7 @@ def upsert(key, value):
     logger.debug('upsert({}, {})'.format(key, value))
     if not options.enabled:
         return
-    _CACHE[key] = value
+    _CACHE[key] = MicrocacheItem(value, ttl)
 
 
 def get(key, default=None):
@@ -70,7 +90,7 @@ def get(key, default=None):
     _set_log_level()
     logger.debug('get({}, default={})'.format(key, default))
     if has(key):
-        return _CACHE[key]
+        return _CACHE[key].value
     return default
 
 
@@ -95,44 +115,43 @@ def clear(key=None):
     """
     _set_log_level()
     logger.debug('clear({})'.format(key))
-    if not options.enabled:
-        return
-    elif key is not None and key in _CACHE.keys():
+    if key is not None and key in _CACHE.keys():
         del _CACHE[key]
     elif not key:
         for cached_key in [k for k in _CACHE.keys()]:
             del _CACHE[cached_key]
 
 
-def this(func):
+@decorator.decorator
+def this(func, ttl=None, *args, **kwargs):
     """ Use the cache as a decorator, essentially this with an override
 
     >>> import microcache
-    >>> @microcache.this
+    >>> @microcache.this(ttl=2)
     ... def dummy():
     ...     print('in the func')
     ...     return 'value'
     ...
+    >>> import time
     >>> dummy()
     in the func
     'value'
     >>> dummy()
     'value'
+    >>> time.sleep(2)
+    >>> dummy()
+    in the func
+    'value'
     """
-
-    @functools.wraps(func)
-    def func_wrapper(*args, **kwargs):
-        _set_log_level()
-        key = func.__name__ + str(args) + str(kwargs)
-        logger.debug('this({})'.format(key))
-        if has(key) and options.enabled:
-            return get(key)
-        value = func(*args, **kwargs)
-        if options.enabled:
-            upsert(key, value)
-        return value
-
-    return func_wrapper
+    _set_log_level()
+    key = func.__name__ + str(args) + str(kwargs)
+    logger.debug('this({})'.format(key))
+    if has(key):
+        return get(key)
+    value = func(*args, **kwargs)
+    if options.enabled:
+        upsert(key, value, ttl)
+    return value
 
 
 def disable(clear_cache=True):

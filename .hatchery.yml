@@ -1,5 +1,5 @@
 ---
 
 test_command:
-    - py.test test_microcache.py --doctest-modules microcache --cov microcache --cov-report=term-missing
+    - py.test --doctest-modules microcache --cov microcache --cov-report=term-missing
     - flake8 microcache
