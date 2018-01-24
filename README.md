@@ -12,9 +12,10 @@ Working on a totally separate project, I found myself wanting to use [funcy.memo
 ## Current features
 
 * Simple upsert and get workflow
+* TTLs for expiring cache items
 * Decorator for "memoization"
 * Enabling and disabling functionality, including a context manager
-* Work directly on the imported module... no additional instantiation
+* Work directly on the imported module... no additional instantiation (unless you want to)
 
 ## Installation
 
@@ -29,6 +30,8 @@ Basic usage
 >>> import microcache
 >>> microcache.has('key')
 False
+>>> microcache.get('key')
+CACHE_MISS
 >>> microcache.get('key', default='default')
 'default'
 >>> microcache.upsert('key', 'value')
@@ -36,6 +39,7 @@ False
 'value'
 >>> microcache.disable()
 >>> microcache.get('key')
+CACHE_DISABLED
 ```
 
 Decorator and context manager
