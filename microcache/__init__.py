@@ -213,6 +213,9 @@ class Microcache(object):
         self.options.enabled = True
         logger.info('cache enabled')
 
+    def items(self):
+        return [(k, v.value) for k, v in self._dict.items()]
+
     @contextlib.contextmanager
     def temporarily_disabled(self):
         """
@@ -302,6 +305,10 @@ def enable():
     (Re)enable the cache
     """
     return CACHE_OBJ.enable()
+
+
+def items():
+    return CACHE_OBJ.items()
 
 
 @contextlib.contextmanager
