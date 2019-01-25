@@ -214,7 +214,9 @@ class Microcache(object):
         logger.info('cache enabled')
 
     def items(self):
-        return [(k, v.value) for k, v in self._dict.items()]
+        keys = list(self._dict.keys())
+        keys.sort()
+        return [(key, self._dict[key].value) for key in keys]
 
     @contextlib.contextmanager
     def temporarily_disabled(self):

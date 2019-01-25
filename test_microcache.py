@@ -264,7 +264,7 @@ def test_globals():
 def test_Microcache_get_items():
     options = microcache.MicrocacheOptions()
     cache = microcache.Microcache(options_obj=options)
-    assert cache.upsert('foo', 'bar') is True
     assert cache.upsert('unfoo', 'unbar') is True
+    assert cache.upsert('foo', 'bar') is True
     # print((set(cache.items())))
     assert cache.items() == [('foo', 'bar'), ('unfoo', 'unbar')]
