@@ -266,5 +266,13 @@ def test_Microcache_get_items():
     cache = microcache.Microcache(options_obj=options)
     assert cache.upsert('unfoo', 'unbar') is True
     assert cache.upsert('foo', 'bar') is True
-    # print((set(cache.items())))
     assert cache.items() == [('foo', 'bar'), ('unfoo', 'unbar')]
+
+
+def test_Microcache_get_items_with_filter():
+    options = microcache.MicrocacheOptions()
+    cache = microcache.Microcache(options_obj=options)
+    assert cache.upsert('unfoo', 'unbar') is True
+    assert cache.upsert('foo', 'bar') is True
+    assert cache.upsert('foo/qux', 'baz') is True
+    assert cache.items(path_root='foo') == [('foo', 'bar'), ('foo/qux', 'baz')]
