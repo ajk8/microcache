@@ -259,3 +259,20 @@ def test_globals():
             assert microcache.upsert('foo', 'baz') is True
         assert microcache.upsert('foo', 'bar') is microcache.CACHE_DISABLED
     assert microcache.get('foo') == 'baz'
+
+
+def test_Microcache_get_items():
+    options = microcache.MicrocacheOptions()
+    cache = microcache.Microcache(options_obj=options)
+    assert cache.upsert('unfoo', 'unbar') is True
+    assert cache.upsert('foo', 'bar') is True
+    assert cache.items() == [('foo', 'bar'), ('unfoo', 'unbar')]
+
+
+def test_Microcache_get_items_with_filter():
+    options = microcache.MicrocacheOptions()
+    cache = microcache.Microcache(options_obj=options)
+    assert cache.upsert('unfoo', 'unbar') is True
+    assert cache.upsert('foo', 'bar') is True
+    assert cache.upsert('foo/qux', 'baz') is True
+    assert cache.items(path_root='foo') == [('foo', 'bar'), ('foo/qux', 'baz')]

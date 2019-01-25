@@ -213,6 +213,30 @@ class Microcache(object):
         self.options.enabled = True
         logger.info('cache enabled')
 
+    def items(self, path_root=None):
+        """
+        Returns a list of key / value pairs of the non-expired items in the cache, optionally filtered by a root path.
+
+        :param path_root: path to filter by
+        :return: list(tuple(key, value))
+        """
+        keys = list(self._dict.keys())
+        keys.sort()
+        ret = []
+
+        for key in keys:
+            # filter out expired items
+            if self._dict[key].is_expired():
+                continue
+
+            # filter out keys that do not match the root path
+            if path_root and not key.startswith(path_root):
+                continue
+
+            ret.append((key, self._dict[key].value))
+
+        return ret
+
     @contextlib.contextmanager
     def temporarily_disabled(self):
         """
@@ -302,6 +326,10 @@ def enable():
     (Re)enable the cache
     """
     return CACHE_OBJ.enable()
+
+
+def items(path_root=None):
+    return CACHE_OBJ.items(path_root)
 
 
 @contextlib.contextmanager
